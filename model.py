@@ -33,8 +33,8 @@ class CBModel(object):
                            metrics=['accuracy'])
         self.model.summary()
 
-    def train(self, train_x, train_y, batch_size, nb_epoch):
-        self.model.fit(train_x, train_y, batch_size=batch_size, nb_epoch=nb_epoch)
+    def train(self, train_x, train_y, batch_size, nb_epoch, verbose=1):
+        self.model.fit(train_x, train_y, batch_size=batch_size, nb_epoch=nb_epoch, verbose=verbose)
 
     def eval(self, test_x, test_y, verbose=0):
         score = self.model.evaluate(test_x, test_y, verbose=verbose)
@@ -49,15 +49,22 @@ class CBModel(object):
             if (pred_x==''):
                 break
             pred_x += " <EOS>"
-            max_length = getSequenceLength(pred_x)
-            pred_x = addPAD([pred_x], 19)
+            #max_length = getSequenceLength(pred_x)
+            pred_x = addPAD([pred_x], 18)
             pred_x  = np.array([tk.texts_to_sequences(pred_x)])
-            pred   = self.model.predict(pred_x, verbose=0)
-            print(pred)
-            """
-            print("[bot] >> {0}".format(keys[values.index(pred[0])]))
+            preds   = self.model.predict(pred_x, verbose=0)
+            #print(pred, pred.shape, np.argmax(pred[0][0]))
+            res = ""
+            for pred in preds:
+                for r in pred:
+                    try:
+                        res += keys[values.index(np.argmax(r))]
+                    except ValueError:
+                        res += "*"
+
+            print("[bot] >> {0}".format(res))
             i += 1
-            """
+
 
     def save(self, sdir, overwrite=True):
         self.model.save(os.path.join(sdir, "chatbot_model.h5"))

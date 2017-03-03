@@ -108,23 +108,26 @@ def splitData(data, late=0.3):
     
     return (np.asarray(s_data1), np.asarray(s_data2))
 
-
 def splitXY(data):
     x = data[:-1]
     y = data[1:]
     
     return (x, y)
 
-def toNHotvec(data, word_dict):
+def toNHotvec(data, word_dict, vocab_size):
     word_val = list(word_dict.values())
     
-    nhot_vec = np.zeros((data.shape[0], data.shape[2], len(word_val)))
+    #nhot_vec = np.zeros((data.shape[0], data.shape[2], len(word_val)))
+    nhot_vec = np.zeros((data.shape[0], data.shape[2], vocab_size))
 
     for i in range(len(data)):
         for j in range(len(data[i][0])):
             if (data[i][0][j] == 0):
                 data[i][0][j] = 1
-            nhot_vec[i][j][word_val.index(data[i][0][j])]=1
+            try:
+                nhot_vec[i][j][word_val.index(data[i][0][j])]=1
+            except IndexError:
+                continue
 
     return (nhot_vec)
 

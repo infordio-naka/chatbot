@@ -14,7 +14,8 @@ savedir  = os.path.join(os.getcwd(), "models/")
 
 # config
 nb_epoch       = 1
-batch_size     = 100
+batch_size     = 32
+vocab_size     = 1000
 model_continue = False
 
 # read Dataset
@@ -27,18 +28,20 @@ data = toNumpy(data)
 
 # prepare data
 train, test = splitData(data, late=0.3)
+#test, _ = splitData(test, late=0.9)
 #print(len(train))
 #print(len(test))
 
 train_x, train_y = splitXY(train)
 #train_x = toNHotvec(train_x, word_dict)
-train_y = toNHotvec(train_y, word_dict)
+train_y = toNHotvec(train_y, word_dict, vocab_size)
 #train_x          = splitTimesteps(train_x, step=1)
 #print(sum(train_x[-1]))
 #print(sum(train_y[-2]))
 #print(len(train_y))
 test_x, test_y   = splitXY(test)
 #test_x           = splitTimesteps(test_x, step=1)
+test_y  = toNHotvec(test_y, word_dict, vocab_size)
 print("...Done!")
 
 # load model or create model
@@ -61,7 +64,7 @@ else:
 print("-------------------")
 print("-   Train Start   -")
 print("-------------------")
-cb.train(train_x, train_y, batch_size, nb_epoch)
+cb.train(train_x, train_y, batch_size, nb_epoch, verbose=1)
 
 # save model
 cb.save(sdir=savedir, overwrite=True)
